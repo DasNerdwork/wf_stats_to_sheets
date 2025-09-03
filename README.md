@@ -12,6 +12,13 @@ Fetches Warframe stats from an API and writes them to a Google Sheet with calcul
 - Adds an info block with last update and EHP formula
 - Automatically sets sheet title, freeze, and filter
 
+## Crontab
+
+This script runs daily to update as soon as new info is added to the API via:
+```bash
+0 9 * * * python wf_go_sheets.py >/dev/null 2>&1
+```
+
 ## Requirements
 
 - Python 3.9+
