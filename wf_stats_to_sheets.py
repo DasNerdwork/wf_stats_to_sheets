@@ -181,17 +181,18 @@ for wf in custom_frames:
         elif wf["name"] in ["Harrow", "Harrow Prime"]:
             max_overshields = 2400
         else:
-            max_overshields = 1200
-        effective_health = wf["health"] * (1 + wf["armor"] / 300)
-        ehp_with_shields = effective_health + wf["shields"]
+            max_overshields = 1200        
+        health, shields, armor, energy = scale_stats(wf, rank=30)
+        effective_health = health * (1 + armor / 300)
+        ehp_with_shields = effective_health + shields
         ehp_with_overshields = ehp_with_shields + max_overshields
         row = [
             wf["name"],
-            round(wf["health"], 2),
-            round(wf["armor"], 2),
+            round(health, 2),
+            round(armor, 2),
             round(effective_health, 2),
-            round(wf["shields"], 2),
-            round(wf["energy"], 2),
+            round(shields, 2),
+            round(energy, 2),
             round(wf["energy_spawn"], 2),
             round(wf["sprint"], 2),
             round(max_overshields, 2),
