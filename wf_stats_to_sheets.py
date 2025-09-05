@@ -37,6 +37,69 @@ def col_to_letter(col_index):
         n = n // 26 - 1
     return letters
 
+def scale_stats(wf, rank=30):
+    """Berechnet die Rank-30 Stats basierend auf DE Growth-Formeln."""
+    health = wf.get("health", 0)
+    shield = wf.get("shield", 0)
+    armor  = wf.get("armor", 0)
+    power  = wf.get("power", 0)
+
+    parent = wf.get("uniqueName", "")
+
+    if parent in ["/Lotus/Powersuits/Sandman/SandmanBaseSuit",  # Inaros
+                  "/Lotus/Powersuits/Devourer/DevourerBaseSuit"]:  # Grendel
+        health += (rank + 2) // 3 * 10
+        health += (rank + 1) // 3 * 10
+        power  += rank // 3 * 5
+
+    elif parent == "/Lotus/Powersuits/Infestation/InfestationBaseSuit":  # Nidus
+        health += (rank + 2) // 3 * 10
+        armor  += (rank + 4) // 6 * 20
+        power  += rank // 6 * 10
+        # heal_rate + ability_strength lassen wir weg, brauchst du nicht in deiner Tabelle
+
+    elif parent == "/Lotus/Powersuits/PaxDuviricus/PaxDuviricusBaseSuit":  # Kullervo
+        health += (rank + 2) // 3 * 20
+        armor  += (rank + 1) // 3 * 10
+        power  += rank // 3 * 5
+
+    elif parent == "/Lotus/Powersuits/IronFrame/IronFrameBaseSuit":  # Hildryn
+        health += (rank + 2) // 3 * 10
+        shield += (rank + 1) // 3 * 25
+        shield += rank // 3 * 25
+
+    elif parent == "/Lotus/Powersuits/BrokenFrame/BrokenFrameBaseSuit":  # Xaku
+        health += (rank + 2) // 3 * 9
+        shield += (rank + 1) // 3 * 9
+        power  += rank // 3 * 7
+
+    elif parent == "/Lotus/Powersuits/Alchemist/AlchemistBaseSuit":  # Lavos
+        health += (rank + 2) // 3 * 20
+        shield += (rank + 1) // 3 * 10
+        armor  += rank // 3 * 10
+
+    elif parent == "/Lotus/Powersuits/Berserker/BerserkerBaseSuit":  # Valkyr
+        health += (rank + 2) // 3 * 10
+        shield += (rank + 1) // 3 * 5
+        power  += rank // 3 * 5
+
+    elif parent in [
+        "/Lotus/Powersuits/Pacifist/PacifistBaseSuit",  # Baruuk
+        "/Lotus/Powersuits/Garuda/GarudaBaseSuit",     # Garuda
+        "/Lotus/Powersuits/Wisp/WispBaseSuit",         # Wisp
+        "/Lotus/Powersuits/Yareli/YareliBaseSuit"      # Yareli
+    ]:
+        health += (rank + 2) // 3 * 10
+        shield += (rank + 1) // 3 * 10
+        power  += rank // 3 * 10
+
+    else:  # Default
+        health += (rank + 2) // 3 * 10
+        shield += (rank + 1) // 3 * 10
+        power  += rank // 3 * 5
+
+    return health, shield, armor, power
+
 # --- Fetch Data ---
 print("Fetching Warframe data...")
 resp = requests.get(API_URL)
@@ -78,10 +141,7 @@ for wf in warframes:
         continue
     seen_names.add(name)
 
-    health = wf["health"]["max"] if isinstance(wf.get("health"), dict) else wf.get("health", 0)
-    shields = wf["shield"]["max"] if isinstance(wf.get("shield"), dict) else wf.get("shield", 0)
-    armor = wf["armor"]["max"] if isinstance(wf.get("armor"), dict) else wf.get("armor", 0)
-    energy = wf["power"]["max"] if isinstance(wf.get("power"), dict) else wf.get("power", 0)
+    health, shields, armor, energy = scale_stats(wf, rank=30)
     sprint = wf.get("sprintSpeed", 0)
 
     # --- Overshield berechnen ---
